@@ -1,15 +1,50 @@
-function calculateLpChange(playerMmr, playerRank, gameOutcome) {
+const rankMmrMap = {
+  Iron: 0,
+  Bronze: 800,
+  Silver: 1200,
+  Gold: 1600,
+  Platinum: 2000,
+  Emerald: 2400,
+  Diamond: 2800,
+  Master: 3200,
+  Grandmaster: 3600,
+  Challenger: 4000,
+};
+
+const divisionMmrMap = {
+  I: 300,
+  II: 200,
+  III: 100,
+  IV: 0,
+};
+
+function calculateLpChange(player, gameOutcome) {
   const baseLp = 20; // Base LP gain/loss
-  const mmrRankDiff = getMmrRankDifference(playerMmr, playerRank);
+
+  const totalLP =
+    rankMmrMap[player.tier] +
+    player.lp +
+    (["Challenger", "Grandmaster", "Master"].includes(player.tier)
+      ? 0
+      : divisionMmrMap[player.division]);
+  let offset = player.mmr - totalLP;
 
   let lpChange;
-  if (gameOutcome === "win") {
-    lpChange = baseLp + mmrRankDiff;
+
+  if (gameOutcome === "defeat") {
+    offset = -offset;
+  }
+  if (offset >= 1000) {
+    lpChange = 35;
+  } else if (offset < -1000) {
+    lpChange = 10;
+  } else if (offset < 0) {
+    lpChange = baseLp + parseInt(offset / 100);
   } else {
-    lpChange = -baseLp + mmrRankDiff;
+    lpChange = baseLp + parseInt((offset * 15) / 1000);
   }
 
-  return Math.max(-100, Math.min(100, lpChange)); // Cap LP change
+  return gameOutcome == "victory" ? lpChange : -lpChange;
 }
 
 function getMmrRankDifference(playerMmr, playerRank) {
@@ -20,46 +55,31 @@ function getMmrRankDifference(playerMmr, playerRank) {
 function getExpectedMmrForRank(playerRank) {
   // Implement this function based on your MMR ranges for each rank
   // This is a placeholder implementation
-  const rankMmrMap = {
-    Iron: 0,
-    Bronze: 800,
-    Silver: 1200,
-    Gold: 1600,
-    Platinum: 2000,
-    Emerald: 2400,
-    Diamond: 2800,
-    Master: 3200,
-    Grandmaster: 3600,
-    Challenger: 4000,
-  };
 
   const [tier] = playerRank.split(" ");
   return rankMmrMap[tier] || 1500;
 }
 
-function updateRating(oldRating, difficulty, outcome, gamesPlayed) {
-  const difficultyRatings = { easy: 1300, medium: 1600, hard: 1900 };
-  const difficultyMultipliers = { easy: 0.8, medium: 1.0, hard: 1.2 };
+function updateRating(oldRating, difficulty, outcome) {
+  const difficultyRatings = {
+    veryEasy: Math.max(oldRating - 400, 0),
+    easy: Math.max(oldRating - 200, 0),
+    medium: oldRating,
+    hard: oldRating + 200,
+    veryHard: oldRating + 400,
+  };
 
   const difficultyRating = difficultyRatings[difficulty];
-  const multiplier = difficultyMultipliers[difficulty];
 
   const expected = calculateExpectedOutcome(oldRating, difficultyRating);
 
-  // Dynamic K-factor
-  const k = 32 * (1 + 1 / Math.log(gamesPlayed + 3));
-
   const ratingChange =
-    k * (outcome === "win" ? 1 - expected : 0 - expected) * multiplier;
-  return oldRating + ratingChange;
+    16 * (outcome === "victory" ? 1 - expected : 0 - expected);
+  return oldRating + parseInt(ratingChange);
 }
 
 function calculateExpectedOutcome(playerRating, difficultyRating) {
   return 1 / (1 + Math.pow(10, (difficultyRating - playerRating) / 400));
-}
-
-function getRankDisplay(player) {
-  return `${player.tier} ${player.division} - ${player.lp} LP`;
 }
 
 export {
@@ -67,5 +87,4 @@ export {
   getMmrRankDifference,
   getExpectedMmrForRank,
   updateRating,
-  getRankDisplay,
 };

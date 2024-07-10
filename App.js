@@ -2,7 +2,6 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
 import Player from "./src/Player";
-import { getRankDisplay } from "./src/elo";
 
 export default function App() {
   const [player, setPlayer] = useState(new Player());
@@ -13,33 +12,81 @@ export default function App() {
       <Text>{rank}</Text>
       <StatusBar style="auto" />
       <Button
-        title={"easy win"}
-        onPress={() => player.updateAfterGame("win", "easy")}
-      />
-      <Button
-        title={"easy loss"}
-        onPress={() => player.updateAfterGame("loss", "easy")}
-      />
-      <Button
-        title={"medium win"}
-        onPress={() => player.updateAfterGame("win", "medium")}
-      />
-      <Button
-        title={"medium loss"}
-        onPress={() => player.updateAfterGame("loss", "medium")}
-      />
-      <Button
-        title={"hard win"}
-        onPress={() => player.updateAfterGame("win", "hard")}
-      />
-      <Button
-        title={"hard loss"}
-        onPress={() => player.updateAfterGame("loss", "hard")}
-      />
-      <Button
-        title="show rank"
+        title={"easy victory"}
         onPress={() => {
-          setRank(getRankDisplay(player));
+          player.updateAfterGame("victory", "veryEasy");
+          setRank(player.getRankDisplay());
+        }}
+      />
+      <Button
+        title={"easy victory"}
+        onPress={() => {
+          player.updateAfterGame("victory", "easy");
+          setRank(player.getRankDisplay());
+        }}
+      />
+      <Button
+        title={"easy victory"}
+        onPress={() => {
+          player.updateAfterGame("victory", "medium");
+          setRank(player.getRankDisplay());
+        }}
+      />
+      <Button
+        title={"easy victory"}
+        onPress={() => {
+          player.updateAfterGame("victory", "hard");
+          setRank(player.getRankDisplay());
+        }}
+      />
+      <Button
+        title={"easy victory"}
+        onPress={() => {
+          player.updateAfterGame("victory", "veryHard");
+          setRank(player.getRankDisplay());
+        }}
+      />
+      <Button
+        title={"easy defeat"}
+        onPress={() => {
+          player.updateAfterGame("defeat", "veryEasy");
+          setRank(player.getRankDisplay());
+        }}
+      />
+      <Button
+        title={"easy defeat"}
+        onPress={() => {
+          player.updateAfterGame("defeat", "easy");
+          setRank(player.getRankDisplay());
+        }}
+      />
+      <Button
+        title={"easy defeat"}
+        onPress={() => {
+          player.updateAfterGame("defeat", "medium");
+          setRank(player.getRankDisplay());
+        }}
+      />
+      <Button
+        title={"easy defeat"}
+        onPress={() => {
+          player.updateAfterGame("defeat", "hard");
+          setRank(player.getRankDisplay());
+        }}
+      />
+      <Button
+        title={"easy defeat"}
+        onPress={() => {
+          player.updateAfterGame("defeat", "veryHard");
+          setRank(player.getRankDisplay());
+        }}
+      />
+
+      <Button
+        title={"reset"}
+        onPress={() => {
+          setPlayer(new Player());
+          setRank(player.getRankDisplay(player));
         }}
       />
     </View>
