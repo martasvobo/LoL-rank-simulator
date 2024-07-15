@@ -62,11 +62,11 @@ function getExpectedMmrForRank(playerRank) {
 
 function updateRating(oldRating, difficulty, outcome) {
   const difficultyRatings = {
-    veryEasy: Math.max(oldRating - 400, 0),
+    "very easy": Math.max(oldRating - 400, 0),
     easy: Math.max(oldRating - 200, 0),
     medium: oldRating,
     hard: oldRating + 200,
-    veryHard: oldRating + 400,
+    "very hard": oldRating + 400,
   };
 
   const difficultyRating = difficultyRatings[difficulty];

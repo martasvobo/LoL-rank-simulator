@@ -1,25 +1,20 @@
 import { updateRating, calculateLpChange } from "./elo";
 export default class Player {
-  constructor(initialMmr = 1500) {
-    this.mmr = initialMmr;
-    this.tier = "Silver";
-    this.division = "IV";
-    this.lp = 0;
-    this.gamesPlayed = 0;
-    this.losspreventions = 1;
-    this.lastChange = 0;
-    this.lastmmrchange = 0;
+  constructor(obj) {
+    this.mmr = obj?.mmr ?? 1500;
+    this.tier = obj?.tier ?? "Silver";
+    this.division = obj?.division ?? "IV";
+    this.lp = obj?.lp ?? 0;
+    this.gamesPlayed = obj?.gamesPlayed ?? 0;
+    this.losspreventions = obj?.losspreventions ?? 1;
+    this.lastChange = obj?.lastChange ?? 0;
+    this.lastmmrchange = obj?.lastmmrchange ?? 0;
   }
 
   updateAfterGame(outcome, difficulty) {
     this.gamesPlayed++;
 
-    const newMMR = updateRating(
-      this.mmr,
-      difficulty,
-      outcome,
-      this.gamesPlayed
-    );
+    const newMMR = updateRating(this.mmr, difficulty, outcome);
     this.lastmmrchange = newMMR - this.mmr;
     this.mmr = newMMR;
 
@@ -100,7 +95,24 @@ export default class Player {
     ) {
       return `${this.tier} - ${this.lp} LP (${this.lastChange})`;
     }
-    return `${this.tier} ${this.division} - ${this.lp} LP (${this.lastChange}) [MMR ${this.mmr} (${this.lastmmrchange}})]`;
+    return `${this.tier} ${this.division} - ${this.lp} LP (${
+      this.lastChange > 0 ? "+" : ""
+    }${this.lastChange}) `;
+  }
+
+  getDebugRankDisplay() {
+    if (
+      this.tier === "Master" ||
+      this.tier === "Grandmaster" ||
+      this.tier === "Challenger"
+    ) {
+      return `${this.tier} - ${this.lp} LP (${this.lastChange})`;
+    }
+    return `${this.tier} ${this.division} - ${this.lp} LP (${
+      this.lastChange > 0 ? "+" : ""
+    }${this.lastChange}) [${this.mmr} (${this.lastmmrchange > 0 ? "+" : ""}${
+      this.lastmmrchange
+    })]`;
   }
 
   tiers = [
